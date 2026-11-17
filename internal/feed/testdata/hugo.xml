@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Sathyajith Bhat on AWS &amp; DevOps</title>
+    <link>https://sathyasays.com/</link>
+    <description>Recent content on Sathyajith Bhat on AWS &amp; DevOps</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>© 2026 Sathyajith Bhat</copyright>
+    <lastBuildDate>Thu, 12 Nov 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://sathyasays.com/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>My Home Server Went Offline for 8 Hours: Debugging an Intel e1000e Hardware Unit Hang</title>
+      <link>https://sathyasays.com/e1000e-hardware-unit-hang/</link>
+      <pubDate>Thu, 12 Nov 2026 00:00:00 +0000</pubDate>
+      
+      <guid>https://sathyasays.com/e1000e-hardware-unit-hang/</guid>
+      <description>My home server dropped off the network for eight hours. Here&amp;rsquo;s how I tracked it down and the fix.</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://sathyasays.com/e1000e-hardware-unit-hang/feature-cronitor-heartbeat.png" />
+    </item><item>
+      <title>It&#39;s Always DNS Part N - Incorrect LAN Interface Edition</title>
+      <link>https://sathyasays.com/its-always-dns-part-n/</link>
+      <pubDate>Thu, 29 Jan 2026 00:00:00 +0000</pubDate>
+      
+      <guid>https://sathyasays.com/its-always-dns-part-n/</guid>
+      <description>Here&amp;rsquo;s how a LAN cable swap broke my Internet connection.</description>
+      
+    </item><item>
+      <title>Clean up pacman cache automatically on Arch Linux</title>
+      <link>https://sathyasays.com/clean-up-pacman-cache-automatically-on-arch-linux/</link>
+      <pubDate>Wed, 31 Dec 2025 00:00:00 +0000</pubDate>
+      
+      <guid>https://sathyasays.com/clean-up-pacman-cache-automatically-on-arch-linux/</guid>
+      <description>Tired of running out of space on your Arch install? Here&amp;rsquo;s a simple way to clean up pacman cache automatically on Arch Linux.</description>
+      
+    </item></channel></rss>

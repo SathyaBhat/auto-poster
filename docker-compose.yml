@@ -1,0 +1,21 @@
+services:
+  auto-poster:
+    build: .
+    restart: unless-stopped
+    environment:
+      - FEEDS=${FEEDS}
+      - ECHOBRIDGE_URL=${ECHOBRIDGE_URL}
+      - ACCOUNT_IDS=${ACCOUNT_IDS:-}
+      - POLL_INTERVAL=${POLL_INTERVAL:-15m}
+    volumes:
+      - auto_poster_data:/data
+    # No ports and no Traefik labels: the service only makes outbound requests.
+    networks:
+      - dokploy-network
+
+volumes:
+  auto_poster_data:
+
+networks:
+  dokploy-network:
+    external: true

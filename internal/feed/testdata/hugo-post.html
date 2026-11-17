@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="scroll-smooth" data-default-appearance="light"
+  data-auto-appearance="true"><head>
+  <meta charset="utf-8" />
+  
+  <meta http-equiv="content-language" content="en" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  
+  <title>My Home Server Went Offline for 8 Hours: Debugging an Intel e1000e Hardware Unit Hang &middot; Sathyajith Bhat on AWS & DevOps</title>
+  <meta name="title" content="My Home Server Went Offline for 8 Hours: Debugging an Intel e1000e Hardware Unit Hang &middot; Sathyajith Bhat on AWS & DevOps" />
+  
+  <meta name="description" content="My home server dropped off the network for eight hours. Here&#39;s how I tracked it down and the fix." />
+  <meta name="keywords" content="linux, arch, networking, e1000e, networkmanager, self-hosting, " />
+  
+  
+  <link rel="canonical" href="https://sathyasays.com/e1000e-hardware-unit-hang/" />
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link type="text/css" rel="stylesheet" href="/css/main.bundle.min.c79255bf9523e0025100f65f6196a25beaa8c4e79e7a95f5d6090e2ee99bda66c9be73cbed1af43b6dd95510f50df54ec8c82904f7dca69be6bcfaa7164f7c95.css"
+    integrity="sha512-x5JVv5Uj4AJRAPZfYZaiW&#43;qoxOeeepX11gkOLumb2mbJvnPL7Rr0O23ZVRD1DfVOyMgpBPfcppvmvPqnFk98lQ==" />
+  
+  
+  <script type="text/javascript" src="/js/appearance.min.516a16745bea5a9bd011138d254cc0fd3973cd55ce6e15f3dec763e7c7c2c7448f8fe7b54cca811cb821b0c7e12cd161caace1dd794ac3d34d40937cbcc9ee12.js"
+    integrity="sha512-UWoWdFvqWpvQERONJUzA/TlzzVXObhXz3sdj58fCx0SPj&#43;e1TMqBHLghsMfhLNFhyqzh3XlKw9NNQJN8vMnuEg=="></script>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <script defer type="text/javascript" id="script-bundle" src="/js/main.bundle.min.d6c35110b5d7df8014403fbb81cd21a9d89daf9eb586c936e585e9d04adc204dce554aa737f81e8c902b9dea9e67bd63a977b77dedefb8a39430581ebc519207.js"
+    integrity="sha512-1sNRELXX34AUQD&#43;7gc0hqdidr561hsk25YXp0ErcIE3OVUqnN/gejJArneqeZ71jqXe3fe3vuKOUMFgevFGSBw==" data-copy="" data-copied=""></script>
+  
+  
+  <script src="/js/zoom.min.js"></script>
+  
+  
+  
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:url" content="https://sathyasays.com/e1000e-hardware-unit-hang/">
+  <meta property="og:site_name" content="Sathyajith Bhat on AWS &amp; DevOps">
+  <meta property="og:title" content="My Home Server Went Offline for 8 Hours: Debugging an Intel e1000e Hardware Unit Hang">
+  <meta property="og:description" content="My home server dropped off the network for eight hours. Here’s how I tracked it down and the fix.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-11-12T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-11-12T19:51:04+11:00">
+    <meta property="article:tag" content="Linux">
+    <meta property="article:tag" content="Arch">
+    <meta property="article:tag" content="Networking">
+    <meta property="article:tag" content="E1000e">
+    <meta property="article:tag" content="Networkmanager">
+    <meta property="article:tag" content="Self-Hosting">
+    <meta property="og:image" content="https://sathyasays.com/e1000e-hardware-unit-hang/feature-cronitor-heartbeat.png">
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://sathyasays.com/e1000e-hardware-unit-hang/feature-cronitor-heartbeat.png">
+  <meta name="twitter:title" content="My Home Server Went Offline for 8 Hours: Debugging an Intel e1000e Hardware Unit Hang">
+  <meta name="twitter:description" content="My home server dropped off the network for eight hours. Here’s how I tracked it down and the fix.">
+
+  
+  <script type="application/ld+json">
+  [{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "articleSection": "Posts",
+    "name": "My Home Server Went Offline for 8 Hours: Debugging an Intel e1000e Hardware Unit Hang",
+    "headline": "My Home Server Went Offline for 8 Hours: Debugging an Intel e1000e Hardware Unit Hang",
+    
+    "abstract": "My home server dropped off the network for eight hours. Here\u0026rsquo;s how I tracked it down and the fix.",
+    "inLanguage": "en",
+    "url" : "https:\/\/sathyasays.com\/e1000e-hardware-unit-hang\/",
+    "author" : {
+      "@type": "Person",
+      "name": "Sathyajith Bhat"
+    },
+    "copyrightYear": "2026",
+    "dateCreated": "2026-11-12T00:00:00\u002b00:00",
+    "datePublished": "2026-11-12T00:00:00\u002b00:00",
+    
+    "dateModified": "2026-11-12T19:51:04\u002b11:00",
+    
+    "keywords": ["linux","arch","networking","e1000e","networkmanager","self-hosting"],
+    
+    "mainEntityOfPage": "true",
+    "wordCount": "1128"
+  }]
+  </script>
+
+
+  
+  
+  <meta name="author" content="Sathyajith Bhat" />
+  
+  
+  
+  <link href="mailto:contact@sathyasays.com" rel="me" />
+  
+  
+  <link href="https://twitter.com/sathyabhat" rel="me" />
+  
+  
+  <link href="https://github.com/sathyabhat" rel="me" />
+  
+  
+  <link href="https://linkedin.com/in/sathyabhat" rel="me" />
+  
+  
+  <link href="https://mastodon.social/@sathyabhat" rel="me" />
+  
+  
+  <link href="https://stackoverflow.com/users/92837/sathyajith-bhat" rel="me" />
+  
+  
+  <link href="https://twitch.tv/sathyabhat" rel="me" />
+  
+  
+  <link href="https://youtube.com/@sathyabhat" rel="me" />
+  
+  
+  
+  
+
+<script src="/lib/jquery/jquery.slim.min.js" integrity=""></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0F35H0ZPQC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-0F35H0ZPQC');
+</script>
+
+
+  
+  
+  <meta name="theme-color"/>
+  
+  
+</head>
+<body
