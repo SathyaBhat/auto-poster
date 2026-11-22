@@ -256,7 +256,7 @@ func (p *poster) handleItem(ctx context.Context, url string, it *feed.Item, acco
 			printPost(a, text)
 			continue
 		}
-		res, err := p.echo.Post(ctx, a.ID, text)
+		res, err := p.echo.Post(ctx, echobridge.IdempotencyKey(url, it.GUID, a.ID), a.ID, text)
 		switch {
 		case err != nil:
 			// The request failed before EchoBridge returned a per-account

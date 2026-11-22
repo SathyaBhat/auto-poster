@@ -9,7 +9,23 @@ import (
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/google/uuid"
 )
+
+// keyNamespaceID is the UUIDv5 namespace for auto-poster's idempotency keys.
+// It keeps the keys apart from other EchoBridge clients' keys. Never change
+// it: existing keys would no longer match.
+const keyNamespaceID = "32ae211b-6cb1-4ae7-9612-f3181caea009"
+
+var keyNamespace = uuid.MustParse(keyNamespaceID)
+
+// IdempotencyKey returns the fixed Idempotency-Key for posting one blog post
+// (feed URL and GUID) to one account. Retries reuse it, so EchoBridge returns
+// the stored result instead of posting twice.
+func IdempotencyKey(feedURL, guid, accountID string) string {
+	return uuid.NewSHA1(keyNamespace, []byte(feedURL+"\n"+guid+"\n"+accountID)).String()
+}
 
 type Client struct {
 	BaseURL string // e.g. https://host/echobridge
@@ -48,8 +64,9 @@ func (c *Client) Accounts(ctx context.Context) ([]Account, error) {
 
 // Post publishes content to one account. EchoBridge accepts several accounts
 // per request, but each platform has its own length limit, so the caller
-// sends one request per account with text sized for that platform.
-func (c *Client) Post(ctx context.Context, accountID, content string) (*Result, error) {
+// sends one request per account with text sized for that platform. key is
+// sent as the Idempotency-Key header; see IdempotencyKey.
+func (c *Client) Post(ctx context.Context, key, accountID, content string) (*Result, error) {
 	body, _ := json.Marshal(map[string]any{
 		"content":     content,
 		"account_ids": []string{accountID},
@@ -59,6 +76,7 @@ func (c *Client) Post(ctx context.Context, accountID, content string) (*Result, 
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Idempotency-Key", key)
 	var out struct {
 		Results []Result `json:"results"`
 	}

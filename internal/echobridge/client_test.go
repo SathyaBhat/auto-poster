@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
 // newServer returns a test EchoBridge that answers both API calls and
@@ -47,7 +49,7 @@ func TestAuthorizationHeader(t *testing.T) {
 			if _, err := c.Accounts(context.Background()); err != nil {
 				t.Fatal(err)
 			}
-			if _, err := c.Post(context.Background(), "a1", "hello"); err != nil {
+			if _, err := c.Post(context.Background(), IdempotencyKey("f", "g", "a1"), "a1", "hello"); err != nil {
 				t.Fatal(err)
 			}
 			if len(got) != 2 {
@@ -62,5 +64,46 @@ func TestAuthorizationHeader(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestIdempotencyKey(t *testing.T) {
+	const feed, guid = "https://example.com/rss", "post-1"
+	k := IdempotencyKey(feed, guid, "a1")
+	if k != IdempotencyKey(feed, guid, "a1") {
+		t.Error("key is not stable")
+	}
+	u, err := uuid.Parse(k)
+	if err != nil {
+		t.Fatalf("key %q is not a UUID: %v", k, err)
+	}
+	if u.Version() != 5 {
+		t.Errorf("key version = %d, want 5", u.Version())
+	}
+	for _, other := range []string{
+		IdempotencyKey(feed, guid, "a2"),
+		IdempotencyKey(feed, "post-2", "a1"),
+		IdempotencyKey("https://other.example/rss", guid, "a1"),
+	} {
+		if other == k {
+			t.Errorf("different inputs gave the same key %s", k)
+		}
+	}
+}
+
+func TestPostSendsIdempotencyKey(t *testing.T) {
+	var got string
+	srv := newServer(t, func(r *http.Request) {
+		if r.URL.Path == "/eb/api/posts" {
+			got = r.Header.Get("Idempotency-Key")
+		}
+	})
+	c := &Client{BaseURL: srv.URL + "/eb", HTTP: srv.Client()}
+	key := IdempotencyKey("https://example.com/rss", "post-1", "a1")
+	if _, err := c.Post(context.Background(), key, "a1", "hello"); err != nil {
+		t.Fatal(err)
+	}
+	if got != key {
+		t.Errorf("Idempotency-Key = %q, want %q", got, key)
 	}
 }

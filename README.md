@@ -21,6 +21,7 @@ https://sathyabh.at/weekly-notes-46-2026/
 - **Length:** each account gets its own post sized to its platform: 300 characters for Bluesky, 500 for Mastodon. If the text is too long, the excerpt is shortened first. If there's no room for at least 40 characters of excerpt, the excerpt is dropped, then hashtags from the end. The link is always kept.
 - **First run:** the first time a feed is seen, every post in it is marked as already posted, so the backlog is never published.
 - **State:** SQLite records each post per account. If one account fails, only that account is retried on the next poll, up to `MAX_ATTEMPTS` times.
+- **No double posts:** each request sends an `Idempotency-Key` derived from the feed URL, the post's GUID and the account ID. A retry after a timeout or restart reuses the key, so EchoBridge returns the earlier result instead of posting again. This also means a platform rejection is final.
 - **Old posts:** posts older than `MAX_AGE` that show up later are skipped, e.g. when an old post's GUID changes.
 
 ## Configuration
