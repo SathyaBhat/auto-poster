@@ -5,6 +5,7 @@ services:
     environment:
       - FEEDS=${FEEDS}
       - ECHOBRIDGE_URL=${ECHOBRIDGE_URL}
+      - ECHOBRIDGE_API_TOKEN=${ECHOBRIDGE_API_TOKEN:-}
       - ACCOUNT_IDS=${ACCOUNT_IDS:-}
       - POLL_INTERVAL=${POLL_INTERVAL:-15m}
     volumes:

@@ -35,6 +35,7 @@ const defaultLimit = 300
 type config struct {
 	feeds       []string
 	echoURL     string
+	echoToken   string
 	accountIDs  []string
 	dbPath      string
 	interval    time.Duration
@@ -46,6 +47,7 @@ func loadConfig() (config, error) {
 	c := config{
 		feeds:       splitList(os.Getenv("FEEDS")),
 		echoURL:     os.Getenv("ECHOBRIDGE_URL"),
+		echoToken:   os.Getenv("ECHOBRIDGE_API_TOKEN"),
 		accountIDs:  splitList(os.Getenv("ACCOUNT_IDS")),
 		dbPath:      envOr("DB_PATH", "./data/auto-poster.db"),
 		interval:    15 * time.Minute,
@@ -100,7 +102,7 @@ func main() {
 		cfg:    cfg,
 		store:  st,
 		feeds:  &feed.Fetcher{Client: httpClient, UserAgent: "auto-poster/1.0"},
-		echo:   &echobridge.Client{BaseURL: cfg.echoURL, HTTP: httpClient},
+		echo:   &echobridge.Client{BaseURL: cfg.echoURL, Token: cfg.echoToken, HTTP: httpClient},
 		dryRun: *dryRun,
 	}
 

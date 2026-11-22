@@ -13,7 +13,9 @@ import (
 
 type Client struct {
 	BaseURL string // e.g. https://host/echobridge
-	HTTP    *http.Client
+	// Token, if set, is sent as "Authorization: Bearer <Token>".
+	Token string
+	HTTP  *http.Client
 }
 
 type Account struct {
@@ -70,6 +72,9 @@ func (c *Client) Post(ctx context.Context, accountID, content string) (*Result, 
 }
 
 func (c *Client) do(req *http.Request, out any) error {
+	if c.Token != "" {
+		req.Header.Set("Authorization", "Bearer "+c.Token)
+	}
 	resp, err := c.HTTP.Do(req)
 	if err != nil {
 		return err

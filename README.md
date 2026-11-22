@@ -29,11 +29,14 @@ https://sathyabh.at/weekly-notes-46-2026/
 |---|---|---|
 | `FEEDS` | required | Comma-separated RSS feed URLs |
 | `ECHOBRIDGE_URL` | required | EchoBridge base URL including any path prefix, e.g. `https://host/echobridge` |
+| `ECHOBRIDGE_API_TOKEN` | none | EchoBridge API token, sent as `Authorization: Bearer <token>`. Must match the server's `ECHOBRIDGE_API_TOKEN` |
 | `ACCOUNT_IDS` | all accounts | Comma-separated EchoBridge account IDs to post to |
 | `DB_PATH` | `./data/auto-poster.db` | SQLite state file |
 | `POLL_INTERVAL` | `15m` | Time between polls (minimum `1m`) |
 | `MAX_AGE` | `168h` | Skip posts published longer ago than this |
 | `MAX_ATTEMPTS` | `3` | Failed attempts per account before giving up on a post |
+
+To turn on the EchoBridge API token, deploy auto-poster with `ECHOBRIDGE_API_TOKEN` set first, then set the same token on EchoBridge. A server without a token ignores the header, but once the server requires one, every request without it fails with 401.
 
 ## Running
 
@@ -48,7 +51,7 @@ go run ./cmd/auto-poster --once
 go run ./cmd/auto-poster
 ```
 
-`docker-compose.yml` is set up for Dokploy. Set `FEEDS` and `ECHOBRIDGE_URL` in the app's environment.
+`docker-compose.yml` is set up for Dokploy. Set `FEEDS`, `ECHOBRIDGE_URL` and, if EchoBridge requires it, `ECHOBRIDGE_API_TOKEN` in the app's environment.
 
 ```bash
 go test ./...
